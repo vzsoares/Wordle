@@ -82,21 +82,27 @@ function App() {
       alert("Try again Tomorrow");
       return;
     }
+
     if (inputtedLettersList.length > 30) {
       return;
     }
+
     if (
       value === "delete" &&
       inputtedLettersList.length / (divisionRule - 5) !== 1 &&
       inputtedLettersList.length !== 0
     ) {
-      let dumblist = [...displayBlocksList];
-      let otherDumbList = [...inputtedLettersList];
-      dumblist[otherDumbList.length - 1].letter = "";
-      otherDumbList.pop();
-      setInputtedLettersList([...otherDumbList]);
-      setDisplayBlocksList([...dumblist]);
+      setDisplayBlocksList(
+        displayBlocksList.map((e, i) => {
+          if (i === inputtedLettersList.length - 1) {
+            return { ...e, letter: "" };
+          }
+          return e;
+        })
+      );
+      setInputtedLettersList(inputtedLettersList.slice(0, -1));
     }
+
     if (event.target.outerText) {
       if (
         Number.isInteger(inputtedLettersList.length / divisionRule) &&
