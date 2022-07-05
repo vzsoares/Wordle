@@ -6,19 +6,22 @@ import { FaGithubSquare } from "react-icons/fa";
 function App() {
   const [word] = useState("TOUGH");
   const [playing, setPlaying] = useState(true);
-  const [divisionRule, setDivisionRule] = useState(5);
-  const [inputBlocksList, setInputBlocksList] = useState(
+  const [divisionRule, setDivisionRule] = useState(5); // divisionRule allows usage of one array as it was multiple smaller arrays
+  const [displayBlocksList, setDisplayBlocksList] = useState(
     Array.from({ length: 30 }, () => {
       return { letter: "", color: "grey" };
     })
   );
+  const [inputtedLettersList, setInputtedLettersList] = useState([]);
 
   const colorFunction = (letter, word, index) => {
+    let colorIndex = index;
     if (!playing) {
       alert("Try again Tomorrow");
       return;
     }
-    let colorIndex = index;
+
+    // reduces letter index to comparable index
     if (index > 4) {
       if (Number.isInteger(index / 5)) {
         colorIndex = 0;
@@ -26,6 +29,8 @@ function App() {
         colorIndex = (Number(String(index / 5).substring(2)) * 5) / 10;
       }
     }
+
+    // compares and return color
     // green
     if (letter === word[colorIndex]) {
       return "#33a652";
@@ -41,29 +46,35 @@ function App() {
       alert("Try again Tomorrow");
       return;
     }
-    if (controlList.length > 30) {
+
+    if (inputtedLettersList.length > 30) {
       setPlaying(false);
       alert("Game Over");
       return;
     }
-    let dumbList = inputBlocksList;
-    controlList.forEach((element, index) => {
-      dumbList[index].letter = element;
-      if (checking) {
-        dumbList[index].color = colorFunction(element, word, index);
-        if (
-          dumbList
-            .slice(divisionRule - 5, divisionRule)
-            .filter((e) => e.color === "#33a652").length === 5
-        ) {
-          setPlaying(false);
-          alert("You Won");
-        }
+
+    // win condition
+    if (checking) {
+      if (inputtedLettersList.slice(-word.length).join("") === word) {
+        setPlaying(false);
+        alert("You Won");
       }
-    });
-    setInputBlocksList([...dumbList]);
+    }
+
+    setDisplayBlocksList(
+      displayBlocksList.map((element, index) => {
+        if (checking) {
+          // checks colors
+          return {
+            ...element,
+            color: colorFunction(element.letter, word, index),
+          };
+        }
+        // add inputted letter to display
+        return { ...element, letter: inputtedLettersList[index] };
+      })
+    );
   };
-  const [controlList, setControlList] = useState([]);
 
   const handleKeyboardClick = (event, value) => {
     event.preventDefault();
@@ -71,35 +82,36 @@ function App() {
       alert("Try again Tomorrow");
       return;
     }
-    if (controlList.length > 30) {
+    if (inputtedLettersList.length > 30) {
       return;
     }
     if (
       value === "delete" &&
-      controlList.length / (divisionRule - 5) !== 1 &&
-      controlList.length !== 0
+      inputtedLettersList.length / (divisionRule - 5) !== 1 &&
+      inputtedLettersList.length !== 0
     ) {
-      let dumblist = [...inputBlocksList];
-      let otherDumbList = [...controlList];
+      let dumblist = [...displayBlocksList];
+      let otherDumbList = [...inputtedLettersList];
       dumblist[otherDumbList.length - 1].letter = "";
       otherDumbList.pop();
-      setControlList([...otherDumbList]);
-      setInputBlocksList([...dumblist]);
+      setInputtedLettersList([...otherDumbList]);
+      setDisplayBlocksList([...dumblist]);
     }
     if (event.target.outerText) {
       if (
-        Number.isInteger(controlList.length / divisionRule) &&
-        controlList.length !== 0
+        Number.isInteger(inputtedLettersList.length / divisionRule) &&
+        inputtedLettersList.length !== 0
       ) {
         alert("Submit First");
         return;
       }
-      setControlList([...controlList, event.target.outerText]);
+      setInputtedLettersList([...inputtedLettersList, event.target.outerText]);
     }
   };
   useEffect(() => {
     updateGrid();
-  }, [controlList]);
+  }, [inputtedLettersList]);
+
   // ELEMENT KEYBOARD
   const Keyboard = () => {
     const inputs = [
@@ -159,8 +171,9 @@ function App() {
         })}
         <a
           style={keyboardStyle}
+          href
           onClick={() => {
-            if (Number.isInteger(controlList.length / divisionRule)) {
+            if (Number.isInteger(inputtedLettersList.length / divisionRule)) {
               updateGrid(true);
               setDivisionRule(divisionRule + 5);
             } else {
@@ -172,14 +185,15 @@ function App() {
         >
           <FaCheck />
         </a>
-        <a
-          href='#none'
+        <a // placeholder
+          href
           onClick={(event) => event.preventDefault()}
           style={{ opacity: "0" }}
         >
           a
         </a>
         <a
+          href
           style={keyboardStyle}
           onClick={(event) => handleKeyboardClick(event, "delete")}
         >
@@ -228,7 +242,7 @@ function App() {
             marginBottom: "2rem",
           }}
         >
-          {inputBlocksList.map((element, index) => {
+          {displayBlocksList.map((element, index) => {
             return (
               <div
                 key={index}
