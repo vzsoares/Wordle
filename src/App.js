@@ -114,11 +114,12 @@ function App() {
       setInputtedLettersList([...inputtedLettersList, event.target.outerText]);
     }
   };
+
   useEffect(() => {
     updateGrid();
   }, [inputtedLettersList]);
 
-  // ELEMENT KEYBOARD
+  // KEYBOARD component
   const Keyboard = () => {
     const inputs = [
       "Q",
@@ -177,16 +178,14 @@ function App() {
         })}
         <a
           style={keyboardStyle}
-          href
+          href='#none'
           onClick={() => {
             if (Number.isInteger(inputtedLettersList.length / divisionRule)) {
               updateGrid(true);
               setDivisionRule(divisionRule + 5);
-            } else {
-              if (playing) {
-                alert("Type Full Word First");
-              } else alert("Try Again Tomorrow");
-            }
+            } else if (playing) {
+              alert("Type Full Word First");
+            } else alert("Try Again Tomorrow");
           }}
         >
           <FaCheck />
@@ -199,7 +198,7 @@ function App() {
           a
         </a>
         <a
-          href
+          href='#none'
           style={keyboardStyle}
           onClick={(event) => handleKeyboardClick(event, "delete")}
         >
