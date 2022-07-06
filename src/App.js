@@ -1,4 +1,3 @@
-import "./App.css";
 import { useState, useEffect } from "react";
 import { FaCheck, FaBackspace } from "react-icons/fa";
 import { FaGithubSquare } from "react-icons/fa";
